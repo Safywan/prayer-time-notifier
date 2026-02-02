@@ -3,7 +3,7 @@ Function that returns the prayer times from the local mosque website
 '''
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
-
+PRAYER_NAMES = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"]
 
 
 def fetch_prayer_times(url):
@@ -29,4 +29,7 @@ def fetch_prayer_times(url):
         # Delete the first element as its not a prayer time
         del prayer_times[0]
 
-        return prayer_times
+        # Return the dictionary with prayer name and time
+        prayers = dict(zip(PRAYER_NAMES, prayer_times))
+
+        return prayers
