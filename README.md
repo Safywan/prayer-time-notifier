@@ -10,8 +10,8 @@ A Python tool that scrapes **live prayer times** from a local mosque website (Ja
 
 - Scrapes prayer times from a dynamic website using **Playwright**
 - Parses the rendered HTML using **BeautifulSoup**
-- Outputs prayer times as a dictionary: `{prayer_name: "HH:MM"}`
-- Notification system (WIP / in progress)
+- Outputs prayer times as a dictionary: `{prayer_time: prayer_name}`
+- Notification system using pushover on android
 
 ---
 
@@ -20,6 +20,8 @@ A Python tool that scrapes **live prayer times** from a local mosque website (Ja
 - Python 3
 - Playwright (Chromium)
 - BeautifulSoup4
+- Pushover
+- Pythonanywhere (server)
 
 ---
 
