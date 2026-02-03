@@ -28,8 +28,13 @@ def fetch_prayer_times(url):
 
         # Delete the first element as its not a prayer time
         del prayer_times[0]
+        
+        # Append AM and PM respectively 
+        prayer_times[0] += "AM"  # Fajr
+        for i in range(1, len(prayer_times)):
+            prayer_times[i] += "PM"  # Dhuhr, Asr, Maghrib
 
         # Return the dictionary with prayer name and time
-        prayers = dict(zip(PRAYER_NAMES, prayer_times))
+        prayers = dict(zip(prayer_times, PRAYER_NAMES))
 
         return prayers
