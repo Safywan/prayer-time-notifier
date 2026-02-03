@@ -5,10 +5,11 @@ import notification
 import schedule
 from dotenv import load_dotenv
 load_dotenv()
-url = "https://awqat.com.au/mgm/"
+
+URL = "https://awqat.com.au/mgm/"
 
 def main():
-    prayer_times = scraper.fetch_prayer_times(url)
+    prayer_times = scraper.fetch_prayer_times(URL)
     #print(prayer_times)
     
     # Get the time right now
