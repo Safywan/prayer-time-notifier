@@ -22,9 +22,9 @@ def main():
     now = datetime.datetime.now()
     curr_time = now.strftime("%-I:%M%p")
     
-    if curr_time in prayer_times:
+    if curr_time in prayer_times and prayer_times[curr_time] != "Sunrise":
     # Send notification if the current time is in the prayer times
-        notification.prayer_time_notification(prayer_times, curr_time)
+        notification.send_notification(prayer_times[curr_time], curr_time)
         print("Notification successful!")
     else:
         print("Not time for prayer yet. Current time is " + curr_time)

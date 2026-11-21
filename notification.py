@@ -1,20 +1,27 @@
-import http.client
-import urllib
 import os
-# Function that sends notification to phone using pushover API
-def prayer_time_notification(prayer_times, curr_time):
-    # Get pushover credentials from environment variables
-    token = os.environ["PUSHOVER_TOKEN"]
-    user = os.environ["PUSHOVER_USER"]
-    conn = http.client.HTTPSConnection("api.pushover.net:443")
-    conn.request("POST", "/1/messages.json",
-                 urllib.parse.urlencode({
-                     "token": token,
-                     "user": user,
-                     "message": "The time right now is " + curr_time + " It's time for " + prayer_times[curr_time] + " prayer."
-                 }), {"Content-type": "application/x-www-form-urlencoded"})
-    conn.getresponse()
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
+def send_notification(prayer_name, prayer_time):
+    topic = os.environ["NTFY_TOPIC"]
+    url = f"https://ntfy.sh/{topic}"
 
+    message = f"It's time for {prayer_name} prayer {prayer_time}."
 
+    headers = {
+        "Title": f"{prayer_name} Prayer Reminder",
+        "Priority": "4",
+        "Tags": "alarm_clock"
+    }
+
+    response = requests.post(
+        url,
+        data=message,
+        headers=headers,
+        timeout=10
+    )
+    
+    response.raise_for_status()
