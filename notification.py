@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def send_notification(prayer_name, prayer_time):
+def send_notification(prayer_name, prayer_time, send_at=None):
     topic = os.environ["NTFY_TOPIC"]
     url = f"https://ntfy.sh/{topic}"
 
@@ -16,6 +16,13 @@ def send_notification(prayer_name, prayer_time):
         "Priority": "4",
         "Tags": "alarm_clock"
     }
+    
+    # Scheduled delivery if a future datetime was provided
+    if send_at is not None:
+        if send_at.tzinfo is None or send_at.utcoffset() is None:
+            raise ValueError("send_at must include a timezone")
+        
+        headers["At"] = str(int(send_at.timestamp()))
 
     response = requests.post(
         url,
@@ -23,5 +30,5 @@ def send_notification(prayer_name, prayer_time):
         headers=headers,
         timeout=10
     )
-    
+
     response.raise_for_status()

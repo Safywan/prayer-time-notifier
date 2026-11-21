@@ -1,38 +1,68 @@
-import scraper 
-import time
 import datetime
+import sys
+from zoneinfo import ZoneInfo
+
+import scraper
 import notification
-import schedule
-from dotenv import load_dotenv
-load_dotenv()
 
 URL = "https://awqat.com.au/mgm/"
+TIMEZONE = ZoneInfo("Australia/Melbourne")
 
-def main():
+EXPECTED_PRAYERS = {
+    "Fajr", "Sunrise", "Dhuhr",
+    "Asr", "Maghrib", "Isha"
+}
+
+
+def main(dry_run=False):
     prayer_times = scraper.fetch_prayer_times(URL)
-    
-    print("\n--- Melbourne Grand Mosque Prayer Times ---")
-    
-    for prayer_time, prayer_name in prayer_times.items():
-        print(f"{prayer_name:<10} {prayer_time}")
-        
-    print("------------------------------------------")
-    
-    # Get the current time 
-    now = datetime.datetime.now()
-    curr_time = now.strftime("%-I:%M%p")
-    
-    if curr_time in prayer_times and prayer_times[curr_time] != "Sunrise":
-    # Send notification if the current time is in the prayer times
-        notification.send_notification(prayer_times[curr_time], curr_time)
-        print("Notification successful!")
-    else:
-        print("Not time for prayer yet. Current time is " + curr_time)
-# schedule.every(1).minute.do(main)
 
-# while 1:
-#     schedule.run_pending()
-#     time.sleep(1)
+    # Check for all expected prayers successfully scraped
+    if (len(prayer_times) != 6 or
+            set(prayer_times.values()) != EXPECTED_PRAYERS):
+        raise ValueError("Invalid prayer data. Nothing scheduled.")
+
+    now = datetime.datetime.now(TIMEZONE)
+    upcoming = []
+
+    print(f"\nPrayer schedule for {now.date()}")
+
+    for prayer_time, prayer_name, in prayer_times.items():
+
+        # Skip sunrise
+        if prayer_name == "Sunrise":
+            continue
+
+        # Convert the string into a time object for ntfy
+        parsed_time = datetime.datetime.strptime(
+            prayer_time, "%I:%M%p"
+        ).time()
+
+        # Combine today's date, prayer time, and timezone
+        send_at = datetime.datetime.combine(
+            now.date(), parsed_time, tzinfo=TIMEZONE
+        )
+
+        # Don't schedule prayers that have already passed
+        if send_at <= now:
+            print(f"SKIPPED: {prayer_name} - {prayer_time}")
+            continue
+
+        upcoming.append((prayer_name, prayer_time, send_at))
+
+    # Schedule each upcoming prayer
+    for prayer_name, prayer_time, send_at in upcoming:
+        if dry_run:
+            print(f"WOULD SCHEDULE: {prayer_name} - {prayer_time}")
+        else:
+            notification.send_notification(
+                prayer_name, prayer_time, send_at
+            )
+            print(f"QUEUED: {prayer_name} - {prayer_time}")
+
+    if not upcoming:
+        print("No remaining prayer today.")
+
+
 if __name__ == "__main__":
-    main()
-       
+    main(dry_run="--dry-run" in sys.argv)
