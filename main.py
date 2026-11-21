@@ -10,7 +10,13 @@ URL = "https://awqat.com.au/mgm/"
 
 def main():
     prayer_times = scraper.fetch_prayer_times(URL)
-    print(prayer_times)
+    
+    print("\n--- Melbourne Grand Mosque Prayer Times ---")
+    
+    for prayer_time, prayer_name in prayer_times.items():
+        print(f"{prayer_name:<10} {prayer_time}")
+        
+    print("------------------------------------------")
     
     # Get the current time 
     now = datetime.datetime.now()
@@ -22,7 +28,6 @@ def main():
         print("Notification successful!")
     else:
         print("Not time for prayer yet. Current time is " + curr_time)
-
 # schedule.every(1).minute.do(main)
 
 # while 1:

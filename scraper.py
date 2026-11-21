@@ -31,7 +31,9 @@ def fetch_prayer_times(url):
         
         # Append AM and PM respectively 
         prayer_times[0] += "AM"  # Fajr
-        for i in range(1, len(prayer_times)):
+        prayer_times[1] += "AM"  # Sunrise
+        
+        for i in range(2, len(prayer_times)):
             prayer_times[i] += "PM"  # Dhuhr, Asr, Maghrib
 
         # Return the dictionary with prayer name and time
